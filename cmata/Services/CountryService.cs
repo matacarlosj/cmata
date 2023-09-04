@@ -18,7 +18,7 @@
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<List<Country>> FilterCountriesByNameAsync(string search)
+        public virtual async Task<List<Country>> FilterCountriesByNameAsync(string search)
         {
             var countries = await GetCountriesAsync();
 
@@ -27,7 +27,7 @@
                 .ToList();
         }
 
-        public async Task<List<Country>> FilterCountriesByPopulationAsync(long populationThreshold)
+        public virtual async Task<List<Country>> FilterCountriesByPopulationAsync(long populationThreshold)
         {
             var countries = await GetCountriesAsync();
 
@@ -36,7 +36,7 @@
                 .ToList();
         }
 
-        public async Task<List<Country>> GetCountriesAsync()
+        public virtual async Task<List<Country>> GetCountriesAsync()
         {
             var response = await _httpClient.GetAsync("https://restcountries.com/v3.1/all");
             response.EnsureSuccessStatusCode();
