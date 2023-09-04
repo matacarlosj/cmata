@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using cmata.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace cmata.Controllers
@@ -8,10 +9,12 @@ namespace cmata.Controllers
     public class CountriesController : ControllerBase
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly CountryService _countryService;
 
-        public CountriesController(IHttpClientFactory httpClientFactory)
+        public CountriesController(IHttpClientFactory httpClientFactory, CountryService countryService)
         {
             _httpClientFactory = httpClientFactory;
+            _countryService = countryService;
         }
 
         [HttpGet]
@@ -77,6 +80,19 @@ namespace cmata.Controllers
                 // Handle any exceptions that may occur during the request.
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
+        }
+
+        [HttpGet("countriesByName")]
+        public async Task<IActionResult> FilterCountriesByName([FromQuery] string search)
+        {
+            if (string.IsNullOrWhiteSpace(search))
+            {
+                return BadRequest("Search query is required.");
+            }
+
+            var filteredCountries = await _countryService.FilterCountriesByNameAsync(search);
+
+            return Ok(filteredCountries);
         }
     }
 }
