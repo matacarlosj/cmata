@@ -16,10 +16,10 @@ namespace cmata.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetCountryData(
-            [FromQuery] string param1 = null,
+            [FromQuery] string? param1 = null,
             [FromQuery] int param2 = 0,
-            [FromQuery] string param3 = null,
-            [FromQuery] string param4 = null)
+            [FromQuery] string? param3 = null,
+            [FromQuery] string? param4 = null)
         {
             try
             {
