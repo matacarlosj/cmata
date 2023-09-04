@@ -139,5 +139,48 @@ namespace cmata.Controllers
 
             return Ok(limitedCountries);
         }
+
+        [HttpGet("filterSortPaginate")]
+        public async Task<IActionResult> FilterSortPaginateCountries([FromQuery] string search, [FromQuery] string sortOrder, [FromQuery] int page, [FromQuery] int pageSize)
+        {
+            var countries = await _countryService.GetCountriesAsync();
+
+            // Apply filtering by name
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                countries = countries.Where(c => c.Name.Common.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            // Apply sorting by name
+            if (!string.IsNullOrWhiteSpace(sortOrder))
+            {
+                if (sortOrder == "ascend")
+                {
+                    countries = countries.OrderBy(c => c.Name.Common).ToList();
+                }
+                else if (sortOrder == "descend")
+                {
+                    countries = countries.OrderByDescending(c => c.Name.Common).ToList();
+                }
+            }
+
+            // Apply pagination
+            var totalCount = countries.Count;
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var paginatedCountries = countries.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new
+            {
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                Page = page,
+                PageSize = pageSize,
+                Data = paginatedCountries
+            };
+
+            return Ok(result);
+        }
+
     }
 }
