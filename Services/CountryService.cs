@@ -36,7 +36,7 @@
                 .ToList();
         }
 
-        private async Task<List<Country>> GetCountriesAsync()
+        public async Task<List<Country>> GetCountriesAsync()
         {
             var response = await _httpClient.GetAsync("https://restcountries.com/v3.1/all");
             response.EnsureSuccessStatusCode();

@@ -107,5 +107,23 @@ namespace cmata.Controllers
 
             return Ok(filteredCountries);
         }
+
+        [HttpGet("sortCountriesByName")]
+        public async Task<IActionResult> SortCountriesByName([FromQuery] string sortOrder)
+        {
+            if (string.IsNullOrWhiteSpace(sortOrder) || (sortOrder != "ascend" && sortOrder != "descend"))
+            {
+                return BadRequest("Sort order must be 'ascend' or 'descend'.");
+            }
+
+            var countries = await _countryService.GetCountriesAsync();
+
+            if (sortOrder == "ascend")
+                countries = countries.OrderBy(c => c.Name.Common).ToList();
+            else
+                countries = countries.OrderByDescending(c => c.Name.Common).ToList();
+
+            return Ok(countries);
+        }
     }
 }

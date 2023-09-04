@@ -1,0 +1,38 @@
+Create a endpoint that accepts a string as an attribute and can sort data by `name/common`. The sort should accept string `ascend or descend` and sort countries name by provided attribute (e.g. providing attribute ascend all countries should be sorted from A to Z)
+ChatGPT
+To create an endpoint that sorts countries by their common names (ascending or descending), you can follow these steps:
+
+Update the CountriesController to include a new action for sorting by name:
+csharp
+Copy code
+[HttpGet("sortByName")]
+public IActionResult SortCountriesByName([FromQuery] string sortOrder)
+{
+    if (string.IsNullOrWhiteSpace(sortOrder) || (sortOrder != "ascend" && sortOrder != "descend"))
+    {
+        return BadRequest("Sort order must be 'ascend' or 'descend'.");
+    }
+
+    var countries = _countryService.GetCountriesAsync().Result; // Synchronously retrieve countries for simplicity
+
+    if (sortOrder == "ascend")
+    {
+        countries = countries.OrderBy(c => c.Name.Common).ToList();
+    }
+    else
+    {
+        countries = countries.OrderByDescending(c => c.Name.Common).ToList();
+    }
+
+    return Ok(countries);
+}
+Update your Startup.cs to add a new route for the sorting by name action:
+csharp
+Copy code
+app.MapControllerRoute(
+    name: "sortByName",
+    pattern: "api/countries/sortByName",
+    defaults: new { controller = "Countries", action = "SortCountriesByName" }
+);
+Now, you can access the sorted countries by making a GET request to /api/countries/sortByName?sortOrder=ascend or /api/countries/sortByName?sortOrder=descend. The sortOrder parameter specifies whether the sorting should be ascending or descending based on the common names of the countries.
+This endpoint will return a list of countries sorted by their common names according to the provided sortOrder.
