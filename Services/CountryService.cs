@@ -27,6 +27,15 @@
                 .ToList();
         }
 
+        public async Task<List<Country>> FilterCountriesByPopulationAsync(long populationThreshold)
+        {
+            var countries = await GetCountriesAsync();
+
+            return countries
+                .Where(c => c.Population < populationThreshold * 1_000_000) // Convert million to actual population
+                .ToList();
+        }
+
         private async Task<List<Country>> GetCountriesAsync()
         {
             var response = await _httpClient.GetAsync("https://restcountries.com/v3.1/all");

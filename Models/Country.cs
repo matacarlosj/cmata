@@ -6,6 +6,8 @@
     {
         [JsonPropertyName("name")]
         public CountryObjectName Name { get; set; } = default!;
+        [JsonPropertyName("population")]
+        public long Population { get; set; }
     }
 
     public class CountryObjectName

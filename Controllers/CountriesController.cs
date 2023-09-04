@@ -94,5 +94,18 @@ namespace cmata.Controllers
 
             return Ok(filteredCountries);
         }
+
+        [HttpGet("countriesByPopulation")]
+        public async Task<IActionResult> FilterCountriesByPopulation([FromQuery] long populationThreshold)
+        {
+            if (populationThreshold <= 0)
+            {
+                return BadRequest("Population threshold must be a positive number.");
+            }
+
+            var filteredCountries = await _countryService.FilterCountriesByPopulationAsync(populationThreshold);
+
+            return Ok(filteredCountries);
+        }
     }
 }

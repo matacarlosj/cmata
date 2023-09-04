@@ -1,0 +1,59 @@
+Create a endpoint that accepts a number as an attribute and can filter by  'population'. The filter should search for countries where the population is less than provided number from attributes in the millions of people (e.g., by providing value `10`, I should find countries with a population less than 10m).
+ChatGPT
+To create an endpoint that filters countries by population, where the population is less than the provided number (in millions), you can follow these steps:
+
+Extend the Country class to include the population property:
+csharp
+Copy code
+using System.Text.Json.Serialization;
+
+public class Country
+{
+    [JsonPropertyName("name")]
+    public Name Name { get; set; }
+
+    [JsonPropertyName("population")]
+    public long Population { get; set; }
+}
+
+public class Name
+{
+    [JsonPropertyName("common")]
+    public string Common { get; set; }
+}
+Modify the CountryService to filter countries by population:
+csharp
+Copy code
+public async Task<List<Country>> FilterCountriesByPopulationAsync(long populationThreshold)
+{
+    var countries = await GetCountriesAsync();
+
+    return countries
+        .Where(c => c.Population < populationThreshold * 1_000_000) // Convert million to actual population
+        .ToList();
+}
+Create a new action in your CountriesController to expose the filtering by population functionality:
+csharp
+Copy code
+[HttpGet("filterByPopulation")]
+public async Task<IActionResult> FilterCountriesByPopulation([FromQuery] long populationThreshold)
+{
+    if (populationThreshold <= 0)
+    {
+        return BadRequest("Population threshold must be a positive number.");
+    }
+
+    var filteredCountries = await _countryService.FilterCountriesByPopulationAsync(populationThreshold);
+
+    return Ok(filteredCountries);
+}
+In your Startup.cs, add a new route for the filtering by population action:
+csharp
+Copy code
+app.MapControllerRoute(
+    name: "filterByPopulation",
+    pattern: "api/countries/filterByPopulation",
+    defaults: new { controller = "Countries", action = "FilterCountriesByPopulation" }
+);
+Now, you can access the filtered countries by making a GET request to /api/countries/filterByPopulation?populationThreshold=YOUR_POPULATION_THRESHOLD. The populationThreshold parameter represents the population threshold in millions.
+For example, by providing a value of 10, you will find countries with a population of less than 10 million people.
