@@ -1,0 +1,30 @@
+Create a endpoint that accepts numbers as an attribute and can limit the number of records. The functionality should accept a number and retrieve first n records (e.g., providing number `15` I should receive 15 first records from API). 
+ChatGPT
+To create an endpoint that limits the number of records retrieved from the API, you can follow these steps:
+
+Update the CountriesController to include a new action for limiting the number of records:
+csharp
+Copy code
+[HttpGet("limit")]
+public async Task<IActionResult> LimitCountries([FromQuery] int recordLimit)
+{
+    if (recordLimit <= 0)
+    {
+        return BadRequest("Record limit must be a positive number.");
+    }
+
+    var countries = await _countryService.GetCountriesAsync();
+    var limitedCountries = countries.Take(recordLimit).ToList();
+
+    return Ok(limitedCountries);
+}
+Add a new route for the limiting action in your Startup.cs:
+csharp
+Copy code
+app.MapControllerRoute(
+    name: "limit",
+    pattern: "api/countries/limit",
+    defaults: new { controller = "Countries", action = "LimitCountries" }
+);
+Now, you can access the limited number of records by making a GET request to /api/countries/limit?recordLimit=YOUR_LIMIT_NUMBER. The recordLimit parameter specifies the maximum number of records you want to retrieve from the API.
+For example, by providing a value of 15, you will receive the first 15 records from the API.

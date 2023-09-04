@@ -82,7 +82,7 @@ namespace cmata.Controllers
             }
         }
 
-        [HttpGet("countriesByName")]
+        [HttpGet("filterCountriesByName")]
         public async Task<IActionResult> FilterCountriesByName([FromQuery] string search)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -95,7 +95,7 @@ namespace cmata.Controllers
             return Ok(filteredCountries);
         }
 
-        [HttpGet("countriesByPopulation")]
+        [HttpGet("filterCountriesByPopulation")]
         public async Task<IActionResult> FilterCountriesByPopulation([FromQuery] long populationThreshold)
         {
             if (populationThreshold <= 0)
@@ -124,6 +124,20 @@ namespace cmata.Controllers
                 countries = countries.OrderByDescending(c => c.Name.Common).ToList();
 
             return Ok(countries);
+        }
+
+        [HttpGet("limitCountries")]
+        public async Task<IActionResult> LimitCountries([FromQuery] int recordLimit)
+        {
+            if (recordLimit <= 0)
+            {
+                return BadRequest("Record limit must be a positive number.");
+            }
+
+            var countries = await _countryService.GetCountriesAsync();
+            var limitedCountries = countries.Take(recordLimit).ToList();
+
+            return Ok(limitedCountries);
         }
     }
 }
